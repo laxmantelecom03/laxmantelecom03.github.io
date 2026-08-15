@@ -1,0 +1,188 @@
+/* Styles for login, signup, dashboard and admin pages */
+/* Uses the same color feel as style.css — adjust colors below to match your site if needed */
+
+:root {
+  --lt-primary: #0d6efd;
+  --lt-dark: #1e2327;
+  --lt-bg: #f4f6f8;
+  --lt-green: #25d366;
+}
+
+.auth-wrapper {
+  max-width: 420px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.auth-wrapper h2 {
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.auth-wrapper p.sub {
+  text-align: center;
+  color: #666;
+  margin-bottom: 22px;
+  font-size: 14px;
+}
+
+.tab-switch {
+  display: flex;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.tab-switch button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #f0f0f0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tab-switch button.active {
+  background: var(--lt-primary);
+  color: #fff;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--lt-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.auth-btn:hover { opacity: 0.9; }
+
+.auth-btn.whatsapp { background: var(--lt-green); }
+
+.auth-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.error-msg {
+  color: #c0392b;
+  background: #fdecea;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.success-msg {
+  color: #1a7a35;
+  background: #eafaf0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.hidden { display: none !important; }
+
+/* Dashboard */
+.dash-wrapper {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 15px;
+}
+
+.dash-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  padding: 22px;
+  margin-bottom: 22px;
+}
+
+.dash-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.logout-btn {
+  background: #eee;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.request-item {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-Pending { background: #fff3cd; color: #856404; }
+.status-InProgress { background: #cce5ff; color: #004085; }
+.status-Done { background: #d4edda; color: #155724; }
+
+table.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table.admin-table th, table.admin-table td {
+  border: 1px solid #eee;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+table.admin-table th {
+  background: #f8f9fa;
+}
+
+#recaptcha-container { margin-bottom: 15px; }
