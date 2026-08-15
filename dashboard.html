@@ -61,7 +61,12 @@
         <label>Details</label>
         <textarea id="reqMessage" rows="3" placeholder="Describe what you need..."></textarea>
       </div>
-      <button type="submit" class="auth-btn">Submit Request</button>
+      <div class="form-group">
+        <label>Upload Document (optional, max 5MB — photo, PDF, Aadhaar, etc.)</label>
+        <input type="file" id="reqFile" accept="image/*,.pdf">
+      </div>
+      <div id="uploadProgress" style="display:none;font-size:13px;color:#666;margin-bottom:10px;">Uploading...</div>
+      <button type="submit" class="auth-btn" id="submitReqBtn">Submit Request</button>
     </form>
   </div>
 
@@ -120,21 +125,79 @@ function loadProfile(uid) {
   });
 }
 
+const CLOUDINARY_CLOUD_NAME = 'xugjl6tk';
+const CLOUDINARY_UPLOAD_PRESET = 'wlfm48rw';
+
+function uploadToCloudinary(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+    method: 'POST',
+    body: formData
+  })
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.secure_url) return data.secure_url;
+    throw new Error(data.error ? data.error.message : 'Upload failed');
+  });
+}
+
 document.getElementById('requestForm').addEventListener('submit', function (e) {
   e.preventDefault();
   const service = document.getElementById('reqService').value;
   const message = document.getElementById('reqMessage').value.trim();
+  const fileInput = document.getElementById('reqFile');
+  const file = fileInput.files[0];
   if (!service) { showError('Please select a service.'); return; }
 
-  db.ref('requests/' + currentUser.uid).push({
-    service,
-    message,
-    status: 'Pending',
-    createdAt: firebase.database.ServerValue.TIMESTAMP
-  }).then(() => {
-    showSuccess('Request submitted!');
-    document.getElementById('requestForm').reset();
-  }).catch((err) => showError(err.message));
+  if (file && file.size > 5 * 1024 * 1024) {
+    showError('File is too large. Max size is 5MB.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitReqBtn');
+  submitBtn.disabled = true;
+
+  function saveRequest(documentUrl, documentName) {
+    return db.ref('requests/' + currentUser.uid).push({
+      service,
+      message,
+      status: 'Pending',
+      documentUrl: documentUrl || null,
+      documentName: documentName || null,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+  if (file) {
+    document.getElementById('uploadProgress').style.display = 'block';
+    uploadToCloudinary(file)
+      .then((url) => saveRequest(url, file.name))
+      .then(() => {
+        showSuccess('Request submitted with document!');
+        document.getElementById('requestForm').reset();
+        document.getElementById('uploadProgress').style.display = 'none';
+        submitBtn.disabled = false;
+      })
+      .catch((err) => {
+        showError(err.message);
+        document.getElementById('uploadProgress').style.display = 'none';
+        submitBtn.disabled = false;
+      });
+  } else {
+    saveRequest(null, null)
+      .then(() => {
+        showSuccess('Request submitted!');
+        document.getElementById('requestForm').reset();
+        submitBtn.disabled = false;
+      })
+      .catch((err) => {
+        showError(err.message);
+        submitBtn.disabled = false;
+      });
+  }
 });
 
 function loadRequests(uid) {
@@ -149,10 +212,12 @@ function loadRequests(uid) {
     container.innerHTML = entries.map(([id, r]) => {
       const statusClass = 'status-' + (r.status || 'Pending').replace(/\s/g, '');
       const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '';
+      const docLink = r.documentUrl ? `<p style="margin:4px 0 0;font-size:13px;"><a href="${r.documentUrl}" target="_blank">📎 ${r.documentName || 'View document'}</a></p>` : '';
       return `<div class="request-item">
         <strong>${r.service}</strong>
         <span class="status-pill ${statusClass}">${r.status || 'Pending'}</span>
         <p style="margin:6px 0 0;color:#555;font-size:14px;">${r.message || ''}</p>
+        ${docLink}
         <p style="margin:4px 0 0;color:#999;font-size:12px;">${date}</p>
       </div>`;
     }).join('');
