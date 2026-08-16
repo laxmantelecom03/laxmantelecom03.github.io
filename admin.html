@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="auth-style.css">
 </head>
 <body>
-
 <header class="header">
   <div class="logo">
     <h1>LAXMAN TELECOM</h1>
@@ -18,19 +17,18 @@
     <a href="index.html#home">Home</a>
   </nav>
 </header>
-
 <div class="dash-wrapper">
-
   <div class="dash-card">
     <div class="dash-top">
       <h2>All Service Requests</h2>
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a href="telecom_settlement_invoice_dashboard_print_enhanced_16.html" class="logout-btn" style="text-decoration:none; display:inline-block;">Recharge Settlement Dashboard</a>
+        <button class="logout-btn" onclick="doLogout()">Logout</button>
+      </div>
     </div>
     <div id="adminContent"><p>Loading...</p></div>
   </div>
-
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -39,7 +37,6 @@
 function doLogout() {
   auth.signOut().then(() => { window.location.href = 'login.html'; });
 }
-
 auth.onAuthStateChanged((user) => {
   if (!user || user.email !== ADMIN_EMAIL) {
     window.location.href = 'login.html';
@@ -47,7 +44,6 @@ auth.onAuthStateChanged((user) => {
   }
   loadAllRequests();
 });
-
 function loadAllRequests() {
   Promise.all([
     db.ref('requests').once('value'),
@@ -55,7 +51,6 @@ function loadAllRequests() {
   ]).then(([reqSnap, userSnap]) => {
     const requestsByUser = reqSnap.val() || {};
     const users = userSnap.val() || {};
-
     let rows = [];
     Object.entries(requestsByUser).forEach(([uid, userRequests]) => {
       const profile = users[uid] || {};
@@ -63,18 +58,14 @@ function loadAllRequests() {
         rows.push({ uid, reqId, profile, ...r });
       });
     });
-
     rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
     const container = document.getElementById('adminContent');
     if (rows.length === 0) {
       container.innerHTML = '<p>No requests yet.</p>';
       return;
     }
-
     let table = `<table class="admin-table">
       <tr><th>Customer</th><th>Contact</th><th>Service</th><th>Details</th><th>Date</th><th>Status</th></tr>`;
-
     rows.forEach((r) => {
       const date = r.createdAt ? new Date(r.createdAt).toLocaleString() : '';
       table += `<tr>
@@ -92,18 +83,15 @@ function loadAllRequests() {
         </td>
       </tr>`;
     });
-
     table += `</table>`;
     container.innerHTML = table;
   }).catch((err) => {
     document.getElementById('adminContent').innerHTML = '<p>Error loading requests: ' + err.message + '</p>';
   });
 }
-
 function updateStatus(uid, reqId, status) {
   db.ref('requests/' + uid + '/' + reqId).update({ status });
 }
 </script>
-
 </body>
 </html>
